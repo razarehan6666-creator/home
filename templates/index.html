@@ -5,185 +5,289 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Milk Data Viewer</title>
     <style>
+        /* Load a nice, modern font (Poppins) */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        /* ====== Overall Page Style ====== */
         body {
-            background: linear-gradient(135deg, #FFD54F, #FFB300);
             font-family: 'Poppins', sans-serif;
             text-align: center;
-            padding: 20px;
-            color: #333;
+            margin: 0;
+            /* Enhanced gradient for a vibrant look */
+            background: linear-gradient(135deg, #f8b500, #ffb574); 
+            min-height: 100vh;
+            padding: 30px 15px; /* Added mobile padding */
+            box-sizing: border-box;
         }
-
         h1 {
-            color: #3E2723;
-            font-size: 36px;
-            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: clamp(1.8em, 5vw, 2.8em); /* Responsive font size */
+            margin-bottom: 30px;
+            text-shadow: 2px 2px #ffffff66;
+            letter-spacing: 1px;
         }
-
-        .month-buttons button {
-            background-color: #00838F;
-            border: none;
-            color: white;
-            padding: 12px 20px;
-            margin: 5px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .month-buttons button:hover {
-            background-color: #00ACC1;
-            transform: scale(1.05);
-        }
-
-        .notice {
-            margin-top: 30px;
-            font-weight: 600;
-            display: inline-block;
-            padding: 12px 25px;
-            border: 2px solid white;
-            border-radius: 15px;
-            background-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            color: #3E2723;
-            font-size: 18px;
-        }
-
-        .content {
+        /* ====== Month Buttons ====== */
+        #buttons {
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            margin-top: 30px;
             flex-wrap: wrap;
-            gap: 40px;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
-
-        .card {
+        button {
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1em;
+            cursor: pointer;
+            /* Updated gradient for buttons */
+            background: linear-gradient(135deg, #1abc9c, #3498db); 
+            color: white;
+            font-weight: 600; /* Medium bold */
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smoother transition */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        button:hover {
+            transform: translateY(-2px) scale(1.05); /* Slight lift and scale */
+            background: linear-gradient(135deg, #2980b9, #16a085);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+        }
+        /* ====== Output Card ====== */
+        #output {
             background: white;
+            max-width: 420px;
+            width: 90%; /* Responsive width */
+            margin: 0 auto;
             border-radius: 20px;
             padding: 25px;
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-            width: 280px;
-            text-align: left;
-            transition: all 0.3s ease;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+            color: #333;
+            font-size: 1.05em;
+            line-height: 1.6;
+            transition: all 0.4s ease;
+            opacity: 0; /* Start hidden for initial state */
+            transform: translateY(15px);
         }
-
-        .card:hover {
-            transform: scale(1.03);
-        }
-
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            width: 300px;
-        }
-
-        .calendar div {
-            background-color: white;
-            border-radius: 6px;
-            padding: 10px;
+        #output.initial {
+            opacity: 1;
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-size: 1em;
+            color: #666;
+            font-style: italic;
             text-align: center;
-            cursor: pointer;
-            transition: background 0.3s ease;
         }
-
-        .calendar div:hover {
-            background-color: #FFECB3;
-        }
-
-        .present {
-            background-color: #81C784 !important;
+        #output h2 {
+            /* Updated header style */
+            background: linear-gradient(45deg, #e74c3c, #f39c12); 
             color: white;
+            padding: 12px 0;
+            border-radius: 15px;
+            margin: -25px -25px 25px -25px; /* Extend gradient to card edges */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            font-weight: 700;
+            font-size: 1.4em;
         }
-
-        .absent {
-            background-color: #E57373 !important;
-            color: white;
+        .field {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 5px;
+            border-bottom: 1px dashed #eee;
         }
-
+        .field b {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        /* ====== Fade-in Animation ====== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #output.show {
+            animation: fadeIn 0.6s ease forwards;
+        }
+        /* ====== Footer ====== */
         footer {
             margin-top: 50px;
-            font-size: 14px;
-            color: #4E342E;
+            color: #2c3e50;
+            font-weight: bold;
+            opacity: 0.9;
         }
-
-        footer small {
-            font-size: 12px;
-            color: #6D4C41;
+        .credit {
+            font-size: 14px;
+            color: #34495e;
+            margin-top: 6px;
+            opacity: 0.7;
         }
     </style>
 </head>
 <body>
     <h1>🥛 Milk Data Month-wise</h1>
-
-    <div class="month-buttons">
-        <button onclick="fetchData('January')">January</button>
-        <button onclick="fetchData('February')">February</button>
-        <button onclick="fetchData('March')">March</button>
-        <button onclick="fetchData('April')">April</button>
-        <button onclick="fetchData('May')">May</button>
-        <button onclick="fetchData('June')">June</button>
-        <button onclick="fetchData('July')">July</button>
-        <button onclick="fetchData('August')">August</button>
-        <button onclick="fetchData('September')">September</button>
-        <button onclick="fetchData('October')">October</button>
-        <button onclick="fetchData('November')">November</button>
-        <button onclick="fetchData('December')">December</button>
+    <div id="buttons">
+        <script>
+            const months = [
+                "January","February","March","April","May","June",
+                "July","August","September","October","November","December"
+            ];
+            // Dynamically generate buttons
+            months.forEach(m => {
+                document.write(`<button onclick="getData('${m}')">${m}</button>`);
+            });
+        </script>
     </div>
-
-    <p class="notice">Click a month to see milk details and tracker</p>
-
-    <div class="content" id="content"></div>
-
+    <div id="output" class="initial">Click a month to view mock milk data.</div>
     <footer>
-        Powered by Flask & Google Sheets ⚙️<br>
-        <small>Made by Farhan</small>
+        Powered by Mock Data & CSS Magic ✨
+        <div class="credit">Original Concept by Farhan</div>
     </footer>
-
     <script>
-        async function fetchData(month) {
-            const response = await fetch(`/data/${month}`);
-            const data = await response.json();
+        // --- MOCK DATA to replace Flask/Server endpoint ---
+        const milkData = {
+            "January": {
+                "Month": "January",
+                "Paid": "<span style='color:#27ae60; font-weight:bold;'>Yes</span>",
+                "Days in Month": 31,
+                "Days Absent": 2,
+                "Days Coming": 29,
+                "Amount": 1450,
+                "Payment Mode": "Online"
+            },
+            "February": {
+                "Month": "February",
+                "Paid": "<span style='color:#c0392b; font-weight:bold;'>No</span>",
+                "Days in Month": 29,
+                "Days Absent": 5,
+                "Days Coming": 24,
+                "Amount": 1200,
+                "Payment Mode": "Cash"
+            },
+            "March": {
+                "Month": "March",
+                "Paid": "<span style='color:#27ae60; font-weight:bold;'>Yes</span>",
+                "Days in Month": 31,
+                "Days Absent": 1,
+                "Days Coming": 30,
+                "Amount": 1500,
+                "Payment Mode": "Online"
+            },
+            "April": {
+                "Month": "April",
+                "Paid": "<span style='color:#27ae60; font-weight:bold;'>Yes</span>",
+                "Days in Month": 30,
+                "Days Absent": 0,
+                "Days Coming": 30,
+                "Amount": 1500,
+                "Payment Mode": "Cash"
+            },
+            "May": {
+                "Month": "May",
+                "Paid": "<span style='color:#e67e22; font-weight:bold;'>Pending</span>",
+                "Days in Month": 31,
+                "Days Absent": 7,
+                "Days Coming": 24,
+                "Amount": 1200,
+                "Payment Mode": "Pending"
+            },
+            "June": {
+                "Month": "June",
+                "Paid": "<span style='color:#27ae60; font-weight:bold;'>Yes</span>",
+                "Days in Month": 30,
+                "Days Absent": 2,
+                "Days Coming": 28,
+                "Amount": 1400,
+                "Payment Mode": "Online"
+            },
+            "July": {
+                "Month": "July",
+                "Paid": "<span style='color:#27ae60; font-weight:bold;'>Yes</span>",
+                "Days in Month": 31,
+                "Days Absent": 3,
+                "Days Coming": 28,
+                "Amount": 1400,
+                "Payment Mode": "Online"
+            },
+            "August": {
+                "Month": "August",
+                "Paid": "<span style='color:#c0392b; font-weight:bold;'>No</span>",
+                "Days in Month": 31,
+                "Days Absent": 10,
+                "Days Coming": 21,
+                "Amount": 1050,
+                "Payment Mode": "Pending"
+            },
+            "September": {
+                "Month": "September",
+                "Paid": "<span style='color:#27ae60; font-weight:bold;'>Yes</span>",
+                "Days in Month": 30,
+                "Days Absent": 0,
+                "Days Coming": 30,
+                "Amount": 1500,
+                "Payment Mode": "Online"
+            },
+            "October": {
+                "Month": "October",
+                "Paid": "<span style='color:#27ae60; font-weight:bold;'>Yes</span>",
+                "Days in Month": 31,
+                "Days Absent": 4,
+                "Days Coming": 27,
+                "Amount": 1350,
+                "Payment Mode": "Cash"
+            },
+            "November": {
+                "Month": "November",
+                "Paid": "<span style='color:#c0392b; font-weight:bold;'>No</span>",
+                "Days in Month": 30,
+                "Days Absent": 8,
+                "Days Coming": 22,
+                "Amount": 1100,
+                "Payment Mode": "Pending"
+            },
+            "December": {
+                "Month": "December",
+                "Paid": "<span style='color:#27ae60; font-weight:bold;'>Yes</span>",
+                "Days in Month": 31,
+                "Days Absent": 1,
+                "Days Coming": 30,
+                "Amount": 1500,
+                "Payment Mode": "Online"
+            }
+        };
 
-            if (!data || Object.keys(data).length === 0) {
-                document.getElementById("content").innerHTML = `<p>No data found for ${month}.</p>`;
+        function getData(month) {
+            // Replaced fetch with local data lookup
+            const data = milkData[month];
+            const out = document.getElementById("output");
+
+            // 1. Remove classes to reset the animation state
+            out.classList.remove("show");
+            out.classList.remove("initial");
+
+            if (!data) {
+                out.innerHTML = `<b style='color:red;'>Data not found for ${month}.</b>`;
                 return;
             }
 
-            const card = `
-                <div class="card">
-                    <h3>${month} Milk Details</h3>
-                    <p><strong>Paid:</strong> ${data.PAID}</p>
-                    <p><strong>No. of Days in Month:</strong> ${data["NO. OF DAYS IN MONTH"]}</p>
-                    <p><strong>No. of Days Absent:</strong> ${data["NO. OF DAYS ABSENT"]}</p>
-                    <p><strong>No. of Days Coming:</strong> ${data["NO. OF DAYS COMING"]}</p>
-                    <p><strong>Amount:</strong> ${data.AMOUNT}</p>
-                    <p><strong>Payment Mode:</strong> ${data["PAYMENT MODE"]}</p>
-                </div>
-            `;
-
-            const totalDays = parseInt(data["NO. OF DAYS IN MONTH"]);
-            let calendar = `<div class="card"><h3>Milk Tracker</h3><div class="calendar">`;
-
-            for (let i = 1; i <= totalDays; i++) {
-                calendar += `<div onclick="toggleDay(this)">${i}</div>`;
-            }
-            calendar += `</div></div>`;
-
-            document.getElementById("content").innerHTML = card + calendar;
-        }
-
-        function toggleDay(cell) {
-            if (cell.classList.contains('present')) {
-                cell.classList.remove('present');
-                cell.classList.add('absent');
-            } else if (cell.classList.contains('absent')) {
-                cell.classList.remove('absent');
-            } else {
-                cell.classList.add('present');
-            }
+            // 2. Delay the content update and animation start slightly
+            // This ensures the browser recognizes the class change and triggers the animation
+            setTimeout(() => {
+                out.innerHTML = `
+                    <h2>${data.Month}</h2>
+                    <div class="field"><b>Paid:</b> <span>${data.Paid}</span></div>
+                    <div class="field"><b>No. of Days in Month:</b> <span>${data["Days in Month"]}</span></div>
+                    <div class="field"><b>No. of Days Absent:</b> <span>${data["Days Absent"]}</span></div>
+                    <div class="field"><b>No. of Days Coming:</b> <span>${data["Days Coming"]}</span></div>
+                    <div class="field"><b>Amount:</b> <span>₹${data.Amount}</span></div>
+                    <div class="field"><b>Payment Mode:</b> <span>${data["Payment Mode"]}</span></div>
+                `;
+                // 3. Add 'show' class to start the fade-in animation
+                out.classList.add("show");
+            }, 50);
         }
     </script>
 </body>
 </html>
+
